@@ -895,10 +895,17 @@ static int ingenicfb_do_suspend(struct ingenicfb_device *fbdev)
 	return ret;
 }
 
-static int ingenicfb_blank(int blank_mode, struct fb_info *info)
+int ingenicfb_blank(int blank_mode, struct fb_info *info)
 {
-	struct ingenicfb_device *fbdev = info->par;
+	struct ingenicfb_device *fbdev;
 	int ret = 0;
+
+	if (!info)
+		return -EINVAL;
+
+	fbdev = info->par;
+	if (!fbdev)
+		return -EINVAL;
 
 	if (blank_mode == FB_BLANK_UNBLANK) {
 		ret = ingenicfb_do_resume(fbdev);
@@ -1084,7 +1091,7 @@ ingenicfb_read(struct fb_info *info, char __user *buf, size_t count, loff_t *ppo
 
 }
 
-static struct fb_ops ingenicfb_ops = {
+static const struct fb_ops ingenicfb_ops = {
 	.owner      = THIS_MODULE,
 	.fb_open    = ingenicfb_open,
 	.fb_release     = ingenicfb_release,
