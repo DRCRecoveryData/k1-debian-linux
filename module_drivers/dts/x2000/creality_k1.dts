@@ -17,11 +17,10 @@
 		#size-cells = <1>;
 		ranges = <>;
 
-		reserved_memory: reserved_mem@6000000{
+		reserved_memory: reserved_mem@f000000 {
 			compatible = "shared-dma-pool";
-			reg-64M = <0x03000000 0x1000000>;
-			reg-128M = <0x07000000 0x1000000>;
-			reg-256M = <0x0f000000 0x1000000>;
+    		reg = <0x0f000000 0x01000000>;
+    		reusable;
 		};
 	};
 
