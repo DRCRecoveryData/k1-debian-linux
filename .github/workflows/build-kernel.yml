@@ -6,10 +6,10 @@ on:
       - anti-freezes-method
   workflow_dispatch:
 
-# Переменные для легкого обновления версии тулчейна
 env:
   TOOLCHAIN_URL: "https://toolchains.bootlin.com/downloads/releases/toolchains/mips32r5el/tarballs/mips32r5el--glibc--bleeding-edge-2025.08-1.tar.xz"
   TOOLCHAIN_TARBALL: "mips32r5el--glibc--bleeding-edge-2025.08-1.tar.xz"
+  TOOLCHAIN_DIR_NAME: "mips32r5el--glibc--bleeding-edge-2025.08-1"
 
 jobs:
   build:
@@ -20,54 +20,65 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Install Dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential libncurses-dev bc rsync u-boot-tools ccache curl
+
+    - name: Download Toolchain and Generate SHA
+      id: download_toolchain
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libncurses-dev bc rsync u-boot-tools ccache
+        curl -fSL -o "${{ env.TOOLCHAIN_TARBALL }}" "${{ env.TOOLCHAIN_URL }}"
+        sha=$(sha256sum "${{ env.TOOLCHAIN_TARBALL }}" | cut -d' ' -f1)
+        echo "sha=$sha" >> $GITHUB_OUTPUT
+
+    - name: Cache and Extract MIPS Toolchain
+      id: cache_toolchain
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/mips-toolchain
+        key: ${{ runner.os }}-toolchain-${{ steps.download_toolchain.outputs.sha }}
+
+    - name: Extract Toolchain if not restored from cache
+      if: steps.cache_toolchain.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p ${{ github.workspace }}/mips-toolchain
+        tar -xJf "${{ env.TOOLCHAIN_TARBALL }}" -C ${{ github.workspace }}/mips-toolchain
+        echo "Toolchain extracted from tarball."
+      
+    - name: Verify Toolchain Cache
+      run: |
+        echo "Cache hit: ${{ steps.cache_toolchain.outputs.cache-hit }}"
+        ls -l ${{ github.workspace }}/mips-toolchain/${{ env.TOOLCHAIN_DIR_NAME }}/bin
 
     - name: Set up Environment Variables
       run: |
-        echo "TOOLCHAIN_DIR=${{ github.workspace }}/mips-toolchain" >> $GITHUB_ENV
-        echo "TOOLCHAIN_PATH=${{ github.workspace }}/mips-toolchain/mips32r5el--glibc--bleeding-edge-2025.08-1" >> $GITHUB_ENV
+        TOOLCHAIN_PATH="${{ github.workspace }}/mips-toolchain/${{ env.TOOLCHAIN_DIR_NAME }}"
+        echo "TOOLCHAIN_PATH=$TOOLCHAIN_PATH" >> $GITHUB_ENV
+        echo "$TOOLCHAIN_PATH/bin" >> $GITHUB_PATH
         echo "CROSS_COMPILE=mipsel-linux-" >> $GITHUB_ENV
         echo "ARCH=mips" >> $GITHUB_ENV
 
-    - name: Cache MIPS Toolchain
-      id: cache-toolchain
+    - name: Get Compiler Version
+      id: compiler_version
+      run: echo "ver=$(mipsel-linux-gcc --version | head -n1)" >> $GITHUB_OUTPUT
+
+    - name: Set up and Cache ccache
       uses: actions/cache@v4
       with:
-        path: ${{ env.TOOLCHAIN_DIR }}
-        key: ${{ runner.os }}-toolchain-${{ env.TOOLCHAIN_TARBALL }}
-
-    - name: Download and Extract Toolchain
-      if: steps.cache-toolchain.outputs.cache-hit != 'true'
-      run: |
-        mkdir -p ${{ env.TOOLCHAIN_DIR }}
-        cd ${{ env.TOOLCHAIN_DIR }}
-        curl -fSL -o "${{ env.TOOLCHAIN_TARBALL }}" "${{ env.TOOLCHAIN_URL }}"
-        tar -xJf "${{ env.TOOLCHAIN_TARBALL }}"
-
-    - name: Add Toolchain to PATH
-      run: echo "${{ env.TOOLCHAIN_PATH }}/bin" >> $GITHUB_PATH
-
-    - name: Set up ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        key: ccache-kernel-${{ runner.os }}-${{ github.ref }}
+        path: ~/.ccache
+        key: ccache-${{ runner.os }}-${{ hashFiles(steps.compiler_version.outputs.ver) }}-v1
         restore-keys: |
-          ccache-kernel-${{ runner.os }}-${{ github.ref }}
-          ccache-kernel-${{ runner.os }}-
+          ccache-${{ runner.os }}-${{ hashFiles(steps.compiler_version.outputs.ver) }}-
 
     - name: Build Kernel and Modules
       run: |
         echo "--- ccache stats before build ---"
+        ccache -z
         ccache -s
         make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} CC="ccache ${{ env.CROSS_COMPILE }}gcc" -j$(nproc) all uImage
         echo "--- ccache stats after build ---"
         ccache -s
 
     - name: Prepare Modules for Artifact
-      run: |
-        make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} INSTALL_MOD_PATH=${{ github.workspace }}/modules_install modules_install
+      run: make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} INSTALL_MOD_PATH=${{ github.workspace }}/modules_install modules_install
 
     - name: Archive Kernel Image
       uses: actions/upload-artifact@v4
@@ -75,16 +86,14 @@ jobs:
         name: kernel-uImage
         path: arch/mips/boot/uImage
 
-    - name: Archive Kernel Modules into Tarball
+    - name: Archive Kernel Modules
       run: |
         cd ${{ github.workspace }}/modules_install/lib/modules
         if [ -n "$(ls -A .)" ]; then
           tar -czf ${{ github.workspace }}/modules.tar.gz *
-        else
-          echo "No modules found to archive."
         fi
 
-    - name: Upload Kernel Modules Artifact
+    - name: Upload Kernel Modules
       uses: actions/upload-artifact@v4
       with:
         name: kernel-modules
