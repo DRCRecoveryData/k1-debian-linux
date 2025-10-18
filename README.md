@@ -28,8 +28,9 @@ bootm 0x80f00000
 
 ```bash
 tar -czf modules-6.6.18+.tar.gz 6.6.18+
-sudo tar -xzf modules-6.6.18+.tar.gz -C /lib/modules/
 
+sudo rm -rf /lib/modules/6.6.18+
+sudo tar -xvf modules.tar -C /lib/modules/
 sudo depmod -a $(uname -r)
 ```
 
