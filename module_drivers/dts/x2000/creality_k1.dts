@@ -17,10 +17,12 @@
 		#size-cells = <1>;
 		ranges = <>;
 
-		reserved_memory: reserved_mem@f000000 {
-			compatible = "shared-dma-pool";
-    		reg = <0x0f000000 0x01000000>;
+  		dpu_reserved: dpu@0f000000 {
+    		compatible = "shared-dma-pool";
+    		no-map;
     		reusable;
+    		reg = <0x0f000000 0x01000000>; /* 16MiB */
+    		linux,cma = <0x01000000>;
 		};
 	};
 
