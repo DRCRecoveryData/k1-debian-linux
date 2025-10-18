@@ -13,18 +13,17 @@
 	};
 
 	reserved-memory {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		ranges = <>;
+    	#address-cells = <1>;
+    	#size-cells = <1>;
+    	ranges;
 
-  		dpu_reserved: dpu@0f000000 {
+		reserved_memory: dpu_reserved@0f000000 {
     		compatible = "shared-dma-pool";
-    		no-map;
+    		reg = <0x0f000000 0x01000000>;
     		reusable;
-    		reg = <0x0f000000 0x01000000>; /* 16MiB */
-    		linux,cma = <0x01000000>;
 		};
 	};
+
 
 	display-dbi {
 		compatible = "simple-bus";
@@ -123,7 +122,7 @@
 	layer,target-pos        = <0 0>, <0 0>, <0 0>, <0 0>;                   //target pos , the start point of the target panel.
 	layer,enable            = <1 0 0 0>;                                    //layer enabled or disabled.
 	ingenic,logo-pan-layer  = <0>;                                          //on which layer should init logo pan on.
-	memory-region=<&reserved_memory>;
+	memory-region = <&reserved_memory>;
 	port {
 		dpu_out_ep: endpoint {
 			remote-endpoint = <&panel_creality_lcd_ep>;
