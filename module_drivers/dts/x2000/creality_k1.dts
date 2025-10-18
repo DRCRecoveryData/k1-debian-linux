@@ -304,6 +304,9 @@
 	
 	mmc-pwrseq = <&wifi_pwrseq>;
 
+	#address-cells = <1>;
+    #size-cells = <0>;
+
 	wifi@1 {
 		reg = <1>;
 		compatible = "brcm,bcm43430a1";
