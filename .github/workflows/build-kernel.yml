@@ -26,8 +26,7 @@ jobs:
       id: download_toolchain
       run: |
         curl -fSL -o "${{ env.TOOLCHAIN_TARBALL }}" "${{ env.TOOLCHAIN_URL }}"
-        sha=$(sha256sum "${{ env.TOOLCHAIN_TARBALL }}" | cut -d' ' -f1)
-        echo "sha=$sha" >> $GITHUB_OUTPUT
+        echo "sha=$(sha256sum ${{ env.TOOLCHAIN_TARBALL }} | cut -d' ' -f1)" >> $GITHUB_OUTPUT
 
     - name: Cache and Extract MIPS Toolchain
       id: cache_toolchain
@@ -41,13 +40,7 @@ jobs:
       run: |
         mkdir -p ${{ github.workspace }}/mips-toolchain
         tar -xJf "${{ env.TOOLCHAIN_TARBALL }}" -C ${{ github.workspace }}/mips-toolchain
-        echo "Toolchain extracted from tarball."
-      
-    - name: Verify Toolchain Cache
-      run: |
-        echo "Cache hit: ${{ steps.cache_toolchain.outputs.cache-hit }}"
-        ls -l ${{ github.workspace }}/mips-toolchain/${{ env.TOOLCHAIN_DIR_NAME }}/bin
-
+    
     - name: Set up Environment Variables
       run: |
         TOOLCHAIN_PATH="${{ github.workspace }}/mips-toolchain/${{ env.TOOLCHAIN_DIR_NAME }}"
@@ -60,13 +53,12 @@ jobs:
       id: compiler_version
       run: echo "ver=$(mipsel-linux-gcc --version | head -n1)" >> $GITHUB_OUTPUT
 
-    - name: Set up and Cache ccache
-      uses: actions/cache@v4
+    - name: Set up ccache using specialized action
+      uses: hendrikmuhs/ccache-action@v1.2
       with:
-        path: ~/.ccache
-        key: ccache-${{ runner.os }}-${{ hashFiles(steps.compiler_version.outputs.ver) }}-v1
+        key: ccache-${{ runner.os }}-${{ steps.compiler_version.outputs.ver }}-v2
         restore-keys: |
-          ccache-${{ runner.os }}-${{ hashFiles(steps.compiler_version.outputs.ver) }}-
+          ccache-${{ runner.os }}-${{ steps.compiler_version.outputs.ver }}-
 
     - name: Build Kernel and Modules
       run: |
