@@ -20,6 +20,7 @@
 		reserved_memory: dpu_reserved@0f000000 {
     		compatible = "shared-dma-pool";
     		reg = <0x0f000000 0x01000000>;
+			reg-256M = <0x0f000000 0x01000000>;    // Специфичное для Ingenic
     		reusable;
 		};
 	};
