@@ -32,7 +32,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{ env.TOOLCHAIN_DIR }}
-        key: ${{ runner.os }}-mips-toolchain-v1 # Ключ можно упростить
+        key: ${{ runner.os }}-mips-toolchain-v1
 
     - name: Download and Extract MIPS Toolchain
       if: steps.cache-toolchain.outputs.cache-hit != 'true'
@@ -55,15 +55,10 @@ jobs:
         restore-keys: |
           ccache-kernel-${{ runner.os }}-${{ github.ref }}
 
-    - name: Build Kernel (uImage) & Modules
+    - name: Build Kernel and Modules
       run: |
-        # Показываем статистику ccache до сборки (для отладки)
         ccache -s
-        
-        # Запускаем сборку с ccache
-        make CC="ccache ${CROSS_COMPILE}gcc" -j$(nproc) all
-        
-        # Показываем статистику после сборки
+        make CC="ccache ${CROSS_COMPILE}gcc" -j$(nproc) all uImage
         echo "---------------- CCACHE STATISTICS ----------------"
         ccache -s
     
@@ -82,4 +77,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: kernel-modules
-        path: ${{ github.workspace }}/modules_install/lib/modules/
+        path: ${{ github.workspace }}/modules_install/lib/modules/```
