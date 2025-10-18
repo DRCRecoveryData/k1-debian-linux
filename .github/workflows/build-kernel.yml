@@ -24,8 +24,8 @@ jobs:
 
     - name: Download and Extract MIPS Toolchain
       run: |
-        wget https://toolchains.bootlin.com/downloads/releases/toolchains/mips32r5el/tarballs/mips32r5el--glibc--bleeding-edge-2025.08-1.tar.bz2
-        tar -xjf mips32r5el--glibc--bleeding-edge-2025.08-1.tar.bz2
+        wget https://toolchains.bootlin.com/downloads/releases/toolchains/mips32r5el/tarballs/mips32r5el--glibc--bleeding-edge-2025.08-1.tar.xz
+        tar -xJf mips32r5el--glibc--bleeding-edge-2025.08-1.tar.xz
         echo "TOOLCHAIN_PATH=${{ github.workspace }}/mips32r5el--glibc--bleeding-edge-2025.08-1" >> $GITHUB_ENV
 
     - name: Set up Environment
