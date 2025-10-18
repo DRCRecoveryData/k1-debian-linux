@@ -3,7 +3,7 @@ name: Build MIPS Kernel
 on:
   push:
     branches:
-      - anti-freezes-method
+      - anti-free-zes-method
   workflow_dispatch:
 
 jobs:
@@ -36,7 +36,6 @@ jobs:
 
     - name: Build Kernel (uImage)
       run: |
-        make defconfig
         make -j$(nproc) uImage
 
     - name: Build Modules
