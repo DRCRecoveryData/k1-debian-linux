@@ -1,0 +1,64 @@
+name: Build MIPS Kernel
+
+on:
+  push:
+    branches:
+      - anti-freezes-method
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Kernel Source
+      uses: actions/checkout@v4
+      with:
+        repository: ivan-habl/k1-debian-linux
+        ref: anti-freezes-method
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libncurses-dev bc rsync u-boot-tools
+
+    - name: Download and Extract MIPS Toolchain
+      run: |
+        wget https://toolchains.bootlin.com/downloads/releases/toolchains/mips32r5el/tarballs/mips32r5el--glibc--bleeding-edge-2025.08-1.tar.bz2
+        tar -xjf mips32r5el--glibc--bleeding-edge-2025.08-1.tar.bz2
+        echo "TOOLCHAIN_PATH=${{ github.workspace }}/mips32r5el--glibc--bleeding-edge-2025.08-1" >> $GITHUB_ENV
+
+    - name: Set up Environment
+      run: |
+        echo "PATH=${{ env.TOOLCHAIN_PATH }}/bin:$PATH" >> $GITHUB_ENV
+        echo "CROSS_COMPILE=mipsel-linux-" >> $GITHUB_ENV
+        echo "ARCH=mips" >> $GITHUB_ENV
+
+    - name: Build Kernel (uImage)
+      run: |
+        make defconfig
+        make -j$(nproc) uImage
+
+    - name: Build Modules
+      run: |
+        make -j$(nproc) modules
+        mkdir -p ${{ github.workspace }}/modules_install
+        make INSTALL_MOD_PATH=${{ github.workspace }}/modules_install modules_install
+
+    - name: Archive Kernel Image
+      uses: actions/upload-artifact@v4
+      with:
+        name: kernel-uImage
+        path: arch/mips/boot/uImage
+
+    - name: Archive Kernel Modules
+      run: |
+        cd ${{ github.workspace }}/modules_install/lib/modules
+        tar -czf modules.tar.gz *
+        mv modules.tar.gz ${{ github.workspace }}/
+      
+    - name: Upload Kernel Modules Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: kernel-modules
+        path: ${{ github.workspace }}/modules.tar.gz
