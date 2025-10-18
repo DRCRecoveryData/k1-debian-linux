@@ -17,6 +17,11 @@ jobs:
         repository: ivan-habl/k1-debian-linux
         ref: anti-freezes-method
 
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libncurses-dev bc rsync u-boot-tools ccache
+
     - name: Set up Toolchain Path
       run: |
         echo "TOOLCHAIN_DIR=${{ github.workspace }}/mips-toolchain" >> $GITHUB_ENV
@@ -27,7 +32,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{ env.TOOLCHAIN_DIR }}
-        key: ${{ runner.os }}-mips-toolchain-2025.08-1
+        key: ${{ runner.os }}-mips-toolchain-v1 # Ключ можно упростить
 
     - name: Download and Extract MIPS Toolchain
       if: steps.cache-toolchain.outputs.cache-hit != 'true'
@@ -42,30 +47,28 @@ jobs:
         echo "PATH=${{ env.TOOLCHAIN_PATH }}/bin:$PATH" >> $GITHUB_ENV
         echo "CROSS_COMPILE=mipsel-linux-" >> $GITHUB_ENV
         echo "ARCH=mips" >> $GITHUB_ENV
-
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libncurses-dev bc rsync u-boot-tools
-
-    - name: Cache Kernel Build
-      id: cache-kernel
-      uses: actions/cache@v4
+    
+    - name: Set up ccache
+      uses: hendrikmuhs/ccache-action@v1.2
       with:
-        path: |
-          .
-          !./mips-toolchain
-        key: ${{ runner.os }}-kernel-build-${{ hashFiles('.config') }}-${{ github.sha }}
+        key: ccache-kernel-${{ runner.os }}-${{ github.ref }}
         restore-keys: |
-          ${{ runner.os }}-kernel-build-${{ hashFiles('.config') }}-
+          ccache-kernel-${{ runner.os }}-${{ github.ref }}
 
-    - name: Build Kernel (uImage)
+    - name: Build Kernel (uImage) & Modules
       run: |
-        make -j$(nproc) uImage
-
-    - name: Build Modules
+        # Показываем статистику ccache до сборки (для отладки)
+        ccache -s
+        
+        # Запускаем сборку с ccache
+        make CC="ccache ${CROSS_COMPILE}gcc" -j$(nproc) all
+        
+        # Показываем статистику после сборки
+        echo "---------------- CCACHE STATISTICS ----------------"
+        ccache -s
+    
+    - name: Prepare Modules for Artifact
       run: |
-        make -j$(nproc) modules
         mkdir -p ${{ github.workspace }}/modules_install
         make INSTALL_MOD_PATH=${{ github.workspace }}/modules_install modules_install
 
