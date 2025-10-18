@@ -73,8 +73,13 @@ jobs:
         name: kernel-uImage
         path: arch/mips/boot/uImage
 
-    - name: Archive Kernel Modules
+    - name: Archive Kernel Modules into Tarball
+      run: |
+        cd ${{ github.workspace }}/modules_install/lib/modules
+        tar -czf ${{ github.workspace }}/modules.tar.gz *
+
+    - name: Upload Kernel Modules Artifact
       uses: actions/upload-artifact@v4
       with:
         name: kernel-modules
-        path: ${{ github.workspace }}/modules_install/lib/modules/```
+        path: ${{ github.workspace }}/modules.tar.gz
