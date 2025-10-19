@@ -193,7 +193,6 @@
 			gpa: gpa {
 				gpio-controller;
 				#gpio-cells = <3>;
-				gpio-ranges = <&pinctrl 0 0 32>;
 				#ingenic,pincfg-cells = <3>;
 				#ingenic,pinmux-cells = <2>;
 				interrupts = <IRQ_GPIO0>;
@@ -205,7 +204,6 @@
 			gpb: gpb {
 				gpio-controller;
 				#gpio-cells = <3>;
-				gpio-ranges = <&pinctrl 0 32 32>;
 				#ingenic,pincfg-cells = <3>;
 				#ingenic,pinmux-cells = <2>;
 				interrupts = <IRQ_GPIO1>;
@@ -217,7 +215,6 @@
 			gpc: gpc {
 				gpio-controller;
 				#gpio-cells = <3>;
-				gpio-ranges = <&pinctrl 0 64 32>;
 				#ingenic,pincfg-cells = <3>;
 				#ingenic,pinmux-cells = <2>;
 				interrupts = <IRQ_GPIO2>;
@@ -229,7 +226,6 @@
 			gpd: gpd {
 				gpio-controller;
 				#gpio-cells = <3>;
-				gpio-ranges = <&pinctrl 0 96 32>;
 				#ingenic,pincfg-cells = <3>;
 				#ingenic,pinmux-cells = <2>;
 				interrupts = <IRQ_GPIO3>;
@@ -241,7 +237,6 @@
 			gpe: gpe {
 				gpio-controller;
 				#gpio-cells = <3>;
-				gpio-ranges = <&pinctrl 0 128 32>;
 				#ingenic,pincfg-cells = <3>;
 				#ingenic,pinmux-cells = <2>;
 				interrupts = <IRQ_GPIO4>;
