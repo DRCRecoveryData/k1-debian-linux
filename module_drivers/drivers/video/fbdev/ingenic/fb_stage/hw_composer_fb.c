@@ -23,6 +23,7 @@
 #include <asm/cacheflush.h>
 #include <linux/of_address.h>
 #include "dpu_reg.h"
+#include "../include/ingenicfb.h"
 #include "hw_composer.h"
 #include "hw_composer_fb.h"
 
@@ -418,13 +419,46 @@ static int compfb_ioctl(struct fb_info *info, unsigned int cmd, unsigned long ar
 	return 0;
 }
 
-static struct fb_ops compfb_layerx_ops = {
+static int compfb_blank(int blank_mode, struct fb_info *info)
+{
+	struct hw_compfb_device *compfb;
+	struct ingenicfb_device *fbdev;
+	struct dpu_ctrl *dctrl;
+	int ret = 0;
+
+	if (!info || !info->par)
+		return -EINVAL;
+
+	compfb = info->par;
+	if (!compfb->parent_fbdev)
+		return -EINVAL;
+
+	fbdev = (struct ingenicfb_device *)compfb->parent_fbdev;
+	dctrl = &fbdev->dctrl;
+
+	if (blank_mode == FB_BLANK_UNBLANK) {
+		if (dctrl->blank) {
+			ret = dpu_ctrl_resume(dctrl);
+			dctrl->blank = 0;
+		}
+	} else {
+		if (!dctrl->blank) {
+			ret = dpu_ctrl_suspend(dctrl);
+			dctrl->blank = 1;
+		}
+	}
+
+	return ret;
+}
+
+static const struct fb_ops compfb_layerx_ops = {
 	.owner      = THIS_MODULE,
 	.fb_open    = compfb_open,
 	.fb_release     = compfb_release,
 	.fb_check_var   = compfb_check_var,
 	.fb_set_par     = compfb_set_par,
 	.fb_setcolreg   = compfb_setcolreg,
+	.fb_blank   = compfb_blank,
 	.fb_pan_display = compfb_pan_display,
 	.fb_write   = ingenicfb_write,
 	.fb_fillrect    = cfb_fillrect,
@@ -845,6 +879,7 @@ struct hw_compfb_device *hw_compfb_init(void *data)
 	}
 
 	/*xxx Init Stuffs.. */
+	compfb->parent_fbdev = data;  /* Store parent ingenicfb_device pointer */
 
 	return compfb;
 }

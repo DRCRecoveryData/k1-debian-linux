@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - anti-freezes-method
+      - blanking-fix
   workflow_dispatch:
 
 env:

@@ -143,6 +143,7 @@ void ingenicfb_clk_enable(struct ingenicfb_device *ingenicfb);
 void ingenicfb_clk_disable(struct ingenicfb_device *fbdev);
 int ingenicfb_release_vidmem(struct ingenicfb_device *fbdev);
 int pan_init_logo(struct fb_info *fb);
+int ingenicfb_blank(int blank_mode, struct fb_info *info);
 
 extern int ingenicfb_register_panel(struct lcd_panel *panel);
 #endif

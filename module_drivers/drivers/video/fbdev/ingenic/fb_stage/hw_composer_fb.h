@@ -32,6 +32,7 @@ struct hw_compfb_device {
 	struct hw_composer_master *comp_master;
 	struct device *dev;
 	struct lcd_panel *panel;
+	void *parent_fbdev;  /* Pointer to parent ingenicfb_device */
 
 	int logo_pan_layer; //init logo pan layer.
 
