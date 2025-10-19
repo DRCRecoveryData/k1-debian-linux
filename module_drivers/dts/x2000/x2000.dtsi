@@ -46,7 +46,7 @@
 			device_type = "cpu";
 			compatible = "ingenic,xburst2";
 			reg = <0x000>;
-			clock-frequency = <1200000000>;
+			clock-frequency = <1500000000>;
 			cpu-idle-states = <&CPU_IDLE_PD>;
 		};
 
@@ -55,7 +55,7 @@
 			compatible = "ingenic,xburst2";
 			reg = <0x001>;
 			cpu-idle-states = <&CPU_IDLE_PD>;
-			clock-frequency = <1200000000>;
+			clock-frequency = <1500000000>;
 		};
 
 		idle-states {
