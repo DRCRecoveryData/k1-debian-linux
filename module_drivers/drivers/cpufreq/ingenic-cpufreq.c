@@ -225,7 +225,7 @@ static int ingenic_cpufreq_resume(struct cpufreq_policy *policy)
 
 static struct cpufreq_driver ingenic_cpufreq_driver = {
 	.name       = "ingenic-cpufreq",
-	.flags      = CPUFREQ_STICKY | CPUFREQ_NEED_INITIAL_FREQ_CHECK,
+	.flags      = CPUFREQ_NEED_INITIAL_FREQ_CHECK,
 	.init       = ingenic_cpufreq_init,
 	.verify     = cpufreq_generic_frequency_table_verify,
 	.target_index   = ingenic_cpufreq_target,
