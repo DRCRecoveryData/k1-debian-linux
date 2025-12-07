@@ -230,7 +230,7 @@
 		compatible = "goodix,gt9xx"; /* do not modify */
 		reg = <0x14>; /* do not modify */
 		reset-gpios = <&gpa 0 GPIO_ACTIVE_LOW INGENIC_GPIO_NOBIAS>; /* RST pin */
-		irq-gpios = <&gpa 3 IRQ_TYPE_EDGE_FALLING INGENIC_GPIO_NOBIAS>; /* INT pin */
+		irq-gpios = <&gpa 3 IRQ_TYPE_EDGE_FALLING INGENIC_GPIO_PULLUP>; /* INT pin */
 		irq-flags = <2>; /* 1 rising, 2 falling */
 		goodix,driver-send-cfg = <0>;
 		touchscreen-size-x = <480>;
