@@ -197,20 +197,24 @@ static struct fb_videomode panel_modes[] = {
 		.xres           = 480,
 		.yres           = 800,
 		/* 
-		 * 26 MHz Pixel Clock.
-		 * Расчет: 1 / 26000000 * 10^12 = 38461
+		 * 27 MHz. Формула: 10^12 / 27000000 = 37037 
+		 * Это "Золотая середина" для K1C
 		 */
-		.pixclock       = 38461, 
+		.pixclock       = 37037, 
 		
 		/* 
-		 * Эти тайминги согласуются с настройками 0xC1 и 0xC2 
-		 * из кода инициализации выше
+		 * Большие горизонтальные отступы убирают "сдвиг" и рябь
 		 */
-		.left_margin    = 10,
-		.right_margin   = 10,
-		.upper_margin   = 20,
-		.lower_margin   = 20,
+		.left_margin    = 30,  // HBP
+		.right_margin   = 30,  // HFP
 		.hsync_len      = 10,
+		
+		/* 
+		 * Вертикальные отступы совпадают с тем, что мы выставили 
+		 * в команде 0xC1 (0x14 = 20)
+		 */
+		.upper_margin   = 20,  // VBP
+		.lower_margin   = 20,  // VFP
 		.vsync_len      = 4,
 		
 		.sync           = FB_SYNC_HOR_HIGH_ACT & FB_SYNC_VERT_HIGH_ACT,
