@@ -209,11 +209,10 @@ static struct fb_videomode panel_modes[] = {
 		.pixclock       = 0,
 		
 		/* 
-		 * Ставим 20, как ты хотел. 
-		 * Меньше "мусора" в сигнале.
+		 * Расширение полей убирает "белые точки" и "линии".
 		 */
-		.left_margin    = 20,
-		.right_margin   = 20,
+		.left_margin    = 30,
+		.right_margin   = 30,
 		.hsync_len      = 10,
 		
 		/* СИНХРОНИЗАЦИЯ С INIT 0xC1 */
