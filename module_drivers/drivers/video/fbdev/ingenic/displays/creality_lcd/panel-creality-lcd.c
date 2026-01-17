@@ -193,36 +193,21 @@ static struct lcd_panel_ops panel_ops = {
 static struct fb_videomode panel_modes[] = {
 	[0] = {
 		.name           = "480x800",
-		.refresh        = 50,
+		.refresh        = 45,
 		.xres           = 480,
 		.yres           = 800,
 		
-		/* 
-		 * Расчет под "узкие" тайминги (Low Bandwidth):
-		 * H_Total = 480 + 20 + 20 + 10 = 530
-		 * V_Total = 800 + 20 + 5 + 10 = 835
-		 * Freq = 530 * 835 * 50 = 22,127,500 Hz
-		 * Pixclock = 45192
-		 * 
-		 * Это очень низкая частота (~22МГц), сигнал должен быть идеальным.
-		 */
 		.pixclock       = 0,
 		
-		/* 
-		 * Расширение полей убирает "белые точки" и "линии".
-		 */
 		.left_margin    = 15,
 		.right_margin   = 15,
 		.hsync_len      = 20,
 		
-		/* СИНХРОНИЗАЦИЯ С INIT 0xC1 */
-		.upper_margin   = 16,   // Совпадает с 0x14
-		.lower_margin   = 16,    // Совпадает с 0x05
+		.upper_margin   = 16,
+		.lower_margin   = 16,
 		
-		/* Оставляем 4, так как это держало картинку стабильной */
 		.vsync_len      = 8,
 		
-		/* Оставляем HIGH_ACT, так как на нем не дрожало */
 		.sync           = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
 		
 		.vmode          = FB_VMODE_NONINTERLACED,
