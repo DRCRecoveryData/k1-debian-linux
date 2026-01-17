@@ -219,7 +219,7 @@ static struct fb_videomode panel_modes[] = {
 		.vsync_len      = 2,
 		
 		/* Sync = 0 (Active Low) - родная полярность */
-		.sync           = 0,
+		.sync           = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
 		
 		.vmode          = FB_VMODE_NONINTERLACED,
 		.flag           = 0,
