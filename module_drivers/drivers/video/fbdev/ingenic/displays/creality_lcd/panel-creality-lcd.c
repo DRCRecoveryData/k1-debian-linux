@@ -196,27 +196,27 @@ static struct fb_videomode panel_modes[] = {
 		.refresh        = 60,
 		.xres           = 480,
 		.yres           = 800,
-		/* 
-		 * 27 MHz. Формула: 10^12 / 27000000 = 37037 
-		 * Это "Золотая середина" для K1C
-		 */
-		.pixclock       = 37037, 
 		
 		/* 
-		 * Большие горизонтальные отступы убирают "сдвиг" и рябь
+		 * Частота 24.5 MHz. 
+		 * Формула: 10^12 / 24500000 = 40816
+		 * Это очень низкая частота для 60Гц, но она стабильна.
 		 */
-		.left_margin    = 30,  // HBP
-		.right_margin   = 30,  // HFP
-		.hsync_len      = 10,
+		.pixclock       = 40816, 
+		
+		/* Горизонтальные тайминги (минимум) */
+		.left_margin    = 10,  // HBP
+		.right_margin   = 10,  // HFP
+		.hsync_len      = 4,
 		
 		/* 
-		 * Вертикальные отступы совпадают с тем, что мы выставили 
-		 * в команде 0xC1 (0x14 = 20)
+		 * ВАЖНО: upper_margin должен быть равен значению 0xC1 из init (30)
 		 */
-		.upper_margin   = 20,  // VBP
-		.lower_margin   = 20,  // VFP
+		.upper_margin   = 30,  // VBP (равно 0x1E)
+		.lower_margin   = 10,  // VFP
 		.vsync_len      = 4,
 		
+		/* Пробуем стандартную полярность */
 		.sync           = FB_SYNC_HOR_HIGH_ACT & FB_SYNC_VERT_HIGH_ACT,
 		.vmode          = FB_VMODE_NONINTERLACED,
 		.flag           = 0,
