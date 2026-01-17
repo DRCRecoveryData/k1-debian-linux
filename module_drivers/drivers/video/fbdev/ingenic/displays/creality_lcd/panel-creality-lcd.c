@@ -193,20 +193,16 @@ static struct lcd_panel_ops panel_ops = {
 static struct fb_videomode panel_modes[] = {
 	[0] = {
 		.name                   = "480x800",
-		.refresh                = 60,           // <-- Было 30, ставим 60
+		.refresh                = 60,
 		.xres                   = 480,
 		.yres                   = 800,
-		.pixclock               = 0,            // Ядро само рассчитает (~24-26MHz)
-		
-		/* Тайминги для 60Гц (нужно немного уменьшить паузы) */
-		.left_margin            = 10,  // HBP (Horizontal Back Porch)
-		.right_margin           = 18,  // HFP (Horizontal Front Porch) - немного увеличим для стабильности
-		.upper_margin           = 20,  // VBP
-		.lower_margin           = 10,  // VFP - уменьшаем, чтобы успеть отрисовать кадр
-		
-		.hsync_len              = 10,  // HSYNC - делаем короче
-		.vsync_len              = 4,   // VSYNC
-		
+		.pixclock               = 0,
+		.left_margin            = 10,
+		.right_margin           = 10,
+		.upper_margin           = 20,
+		.lower_margin           = 20,
+		.hsync_len              = 20,
+		.vsync_len              = 4,
 		.sync                   = FB_SYNC_HOR_HIGH_ACT & FB_SYNC_VERT_HIGH_ACT,
 		.vmode                  = FB_VMODE_NONINTERLACED,
 		.flag                   = 0,
