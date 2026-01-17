@@ -192,37 +192,32 @@ static struct lcd_panel_ops panel_ops = {
 
 static struct fb_videomode panel_modes[] = {
 	[0] = {
-		.name                   = "480x800",
-		.refresh                = 60,
-		.xres                   = 480,
-		.yres                   = 800,
+		.name           = "480x800",
+		.refresh        = 60,
+		.xres           = 480,
+		.yres           = 800,
+		/* 
+		 * 26 MHz Pixel Clock.
+		 * Расчет: 1 / 26000000 * 10^12 = 38461
+		 */
+		.pixclock       = 38461, 
 		
 		/* 
-		 * Цель: Частота ~25.8 МГц (безопасная зона для шлейфов)
-		 * Pixclock = 10^12 / 25826400 ≈ 38720 ps
+		 * Эти тайминги согласуются с настройками 0xC1 и 0xC2 
+		 * из кода инициализации выше
 		 */
-		.pixclock               = 38720,
-
-		/* Горизонтальные тайминги зажаты для снижения частоты */
-		.left_margin            = 10,   // HBP: минимум
-		.right_margin           = 10,   // HFP: минимум
-		.hsync_len              = 10,   // HSYNC: короткий импульс
+		.left_margin    = 10,
+		.right_margin   = 10,
+		.upper_margin   = 20,
+		.lower_margin   = 20,
+		.hsync_len      = 10,
+		.vsync_len      = 4,
 		
-		/* 
-		 * Вертикальные тайминги оставлены как в оригинале (30Гц),
-		 * так как ST7701 привык к этой структуре кадра.
-		 */
-		.upper_margin           = 20,   // VBP
-		.lower_margin           = 20,   // VFP
-		.vsync_len              = 4,    // VSYNC
-
-		/* Оставляем полярность как была в рабочем 30Гц конфиге */
-		.sync                   = FB_SYNC_HOR_HIGH_ACT & FB_SYNC_VERT_HIGH_ACT,
-		.vmode                  = FB_VMODE_NONINTERLACED,
-		.flag                   = 0,
+		.sync           = FB_SYNC_HOR_HIGH_ACT & FB_SYNC_VERT_HIGH_ACT,
+		.vmode          = FB_VMODE_NONINTERLACED,
+		.flag           = 0,
 	},
 };
-
 
 static struct tft_config creality_lcd_cfg = {
 	.pix_clk_inv = 1,
