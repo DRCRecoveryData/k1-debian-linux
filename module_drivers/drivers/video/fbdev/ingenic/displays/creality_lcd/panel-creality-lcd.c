@@ -196,14 +196,19 @@ static struct fb_videomode panel_modes[] = {
 		.refresh                = 60,
 		.xres                   = 480,
 		.yres                   = 800,
-		.pixclock               = 0,
-		.left_margin            = 10,
-		.right_margin           = 10,
-		.upper_margin           = 20,
-		.lower_margin           = 20,
-		.hsync_len              = 20,
-		.vsync_len              = 4,
-		.sync                   = FB_SYNC_HOR_HIGH_ACT & FB_SYNC_VERT_HIGH_ACT,
+		.pixclock               = 0, /* ~27 MHz (1000000000 / 27000) */
+		
+		/* Горизонтальные тайминги (Total = 480 + 10 + 50 + 10 = 550) */
+		.left_margin            = 10,  /* HBP */
+		.right_margin           = 50,  /* HFP (увеличим паузу для стабильности) */
+		.hsync_len              = 10,  /* HSYNC */
+		
+		/* Вертикальные тайминги (Total = 800 + 10 + 20 + 4 = 834) */
+		.upper_margin           = 10,  /* VBP */
+		.lower_margin           = 20,  /* VFP */
+		.vsync_len              = 4,   /* VSYNC */
+		
+		.sync                   = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT, /* Обратите внимание: обычно тут OR (|), а не AND (&) */
 		.vmode                  = FB_VMODE_NONINTERLACED,
 		.flag                   = 0,
 	},
