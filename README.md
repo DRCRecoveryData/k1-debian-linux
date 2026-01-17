@@ -31,7 +31,9 @@ bootm 0x80f00000
 
 ```bash
 tar -czf modules-6.6.18+.tar.gz 6.6.18+
+```
 
+```bash
 sudo rm -rf /lib/modules/6.6.18+
 sudo tar -xvf modules.tar.gz -C /lib/modules/
 sudo depmod -a $(uname -r)
@@ -45,21 +47,12 @@ sudo dd if=/home/printer/uImage of=/dev/mmcblk0p3
 
 ## Запись ядра
 
-Заполняем раздел p3 нулями
-
-```bash
-sudo dd if=/dev/zero of=/dev/mmcblk0p3 bs=4K
-```
-
-Записываем новый образ поверх нулей
-
-```bash
-sudo dd if=/home/printer/uImage.gz of=/dev/mmcblk0p3
-```
-
+Заполняем раздел p3 нулями и записываем новый образ поверх нулей.
 Синхронизация!
 
 ```bash
+sudo dd if=/dev/zero of=/dev/mmcblk0p3 bs=4K
+sudo dd if=/home/printer/uImage of=/dev/mmcblk0p3
 sync
 ```
 
