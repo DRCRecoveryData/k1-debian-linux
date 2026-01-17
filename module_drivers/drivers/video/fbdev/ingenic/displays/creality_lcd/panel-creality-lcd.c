@@ -211,8 +211,8 @@ static struct fb_videomode panel_modes[] = {
 		/* 
 		 * Расширение полей убирает "белые точки" и "линии".
 		 */
-		.left_margin    = 30,
-		.right_margin   = 30,
+		.left_margin    = 15,
+		.right_margin   = 15,
 		.hsync_len      = 10,
 		
 		/* СИНХРОНИЗАЦИЯ С INIT 0xC1 */
