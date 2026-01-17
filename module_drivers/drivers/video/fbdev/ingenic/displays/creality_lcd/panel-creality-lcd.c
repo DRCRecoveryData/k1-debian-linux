@@ -216,8 +216,8 @@ static struct fb_videomode panel_modes[] = {
 		.hsync_len      = 20,
 		
 		/* СИНХРОНИЗАЦИЯ С INIT 0xC1 */
-		.upper_margin   = 25,   // Совпадает с 0x14
-		.lower_margin   = 25,    // Совпадает с 0x05
+		.upper_margin   = 10,   // Совпадает с 0x14
+		.lower_margin   = 10,    // Совпадает с 0x05
 		
 		/* Оставляем 4, так как это держало картинку стабильной */
 		.vsync_len      = 4,
