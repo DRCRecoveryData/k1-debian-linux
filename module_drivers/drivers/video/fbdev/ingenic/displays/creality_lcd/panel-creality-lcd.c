@@ -198,29 +198,26 @@ static struct fb_videomode panel_modes[] = {
 		.yres           = 800,
 		
 		/* 
-		 * ~23 MHz.
-		 * Pixclock = 10^12 / 23000000 = 43478
+		 * Точный расчет под новую геометрию:
+		 * (480 + 30 + 30 + 10) * (800 + 20 + 10 + 4) * 50 Гц = 22,935,000 Гц
+		 * Pixclock = 43601
 		 */
-		.pixclock       = 43478,
+		.pixclock       = 43601,
 		
-		/* Оставляем широкие поля для стабильности */
 		.left_margin    = 30,
 		.right_margin   = 30,
 		.hsync_len      = 10,
 		
-		/* Вертикаль синхронизирована с 0xC1 (0x14 = 20) */
-		.upper_margin   = 20,
-		.lower_margin   = 12,
+		/* !!! СИНХРОНИЗАЦИЯ С INIT-КОДОМ !!! */
+		.upper_margin   = 20,   // Совпадает с 0x14
+		.lower_margin   = 10,   // Совпадает с 0x0A. Это остановит "плавание" картинки.
+		
 		.vsync_len      = 4,
 		
 		/* 
-		 * ГЛАВНОЕ ИЗМЕНЕНИЕ: .sync = 0
-		 * Это означает:
-		 * HSYNC: Active Low
-		 * VSYNC: Active Low
-		 * Pixel Clock: Rising Edge (стандарт)
-		 * 
-		 * Это должно убрать дрожание, которое вызывалось Active High.
+		 * Ставим 0 (Active Low).
+		 * В оригинале было (HOR_HIGH & VERT_HIGH), что в языке Си дает 0.
+		 * Это родная полярность для этой панели.
 		 */
 		.sync           = 0,
 		
