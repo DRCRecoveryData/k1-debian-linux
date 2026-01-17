@@ -198,30 +198,33 @@ static struct fb_videomode panel_modes[] = {
 		.yres           = 800,
 		
 		/* 
-		 * 22 MHz. 
-		 * Pixclock = 10^12 / 22000000 = 45454
+		 * 23.5 MHz. 
+		 * Чуть подняли частоту, чтобы компенсировать увеличенные паузы.
+		 * Расчет: 10^12 / 23576000 = 42416
 		 */
-		.pixclock       = 45454,
-		
-		.left_margin    = 24,
-		.right_margin   = 24,
-		.hsync_len      = 10,
-		
-		/* upper_margin (20) совпадает с 0xC1 (0x14) в init-коде */
-		.upper_margin   = 20,
-		.lower_margin   = 12,   // Чуть увеличили VFP
+		.pixclock       = 42416,
 		
 		/* 
-		 * Увеличиваем длину VSYNC импульса до 10, чтобы "протолкнуть" кадр.
+		 * Расширяем горизонт: 
+		 * Было 24/24 -> Ставим 30/30. 
+		 * Это "подушка безопасности" для данных строки.
 		 */
+		.left_margin    = 30,
+		.right_margin   = 30,
+		
+		/* 
+		 * Усиливаем HSYNC:
+		 * Было 10 -> Ставим 20. 
+		 * Это помогает экрану четче ловить начало строки.
+		 */
+		.hsync_len      = 20,
+		
+		/* Вертикальные тайминги не трогаем, они работают */
+		.upper_margin   = 20,
+		.lower_margin   = 12,
 		.vsync_len      = 10,
 		
-		/* 
-		 * УБРАНА инверсия 0x40000000. 
-		 * Возвращаем стандартную полярность High Active.
-		 */
 		.sync           = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
-		
 		.vmode          = FB_VMODE_NONINTERLACED,
 		.flag           = 0,
 	},
