@@ -191,37 +191,40 @@ static struct lcd_panel_ops panel_ops = {
 };
 
 static struct fb_videomode panel_modes[] = {
-    [0] = {
-        .name           = "480x800",
-        .refresh        = 50,    // <-- 50 Гц: плавно и стабильно
-        .xres           = 480,
-        .yres           = 800,
-        
-        /* 
-         * Расчет Pixel Clock для 50Гц:
-         * (480+40) * (800+30) * 50 = 21,580,000 Гц
-         * Pixclock = 10^12 / 21580000 = 46339 ps
-         */
-        .pixclock       = 46339,
-        
-        /* Умеренные отступы для стабильности */
-        .left_margin    = 20,   // HBP
-        .right_margin   = 20,   // HFP
-        .hsync_len      = 10,
-        
-        /* Вертикальные отступы (синхронизированы с init 0xC1) */
-        .upper_margin   = 20,   // VBP (0x14)
-        .lower_margin   = 10,   // VFP
-        .vsync_len      = 4,
-        
-        /* 
-         * ВАЖНО: Добавляем инверсию клока (или уберите FB_SYNC_CLK_LAT_FALLING, если будет ошибка компиляции).
-         * Если с этим флагом картинка всё еще "шумит", попробуйте удалить его.
-         */
-        .sync           = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT | 0x40000000, 
-        .vmode          = FB_VMODE_NONINTERLACED,
-        .flag           = 0,
-    },
+	[0] = {
+		.name           = "480x800",
+		.refresh        = 50,
+		.xres           = 480,
+		.yres           = 800,
+		
+		/* 
+		 * 22 MHz. 
+		 * Pixclock = 10^12 / 22000000 = 45454
+		 */
+		.pixclock       = 45454,
+		
+		.left_margin    = 24,
+		.right_margin   = 24,
+		.hsync_len      = 10,
+		
+		/* upper_margin (20) совпадает с 0xC1 (0x14) в init-коде */
+		.upper_margin   = 20,
+		.lower_margin   = 12,   // Чуть увеличили VFP
+		
+		/* 
+		 * Увеличиваем длину VSYNC импульса до 10, чтобы "протолкнуть" кадр.
+		 */
+		.vsync_len      = 10,
+		
+		/* 
+		 * УБРАНА инверсия 0x40000000. 
+		 * Возвращаем стандартную полярность High Active.
+		 */
+		.sync           = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+		
+		.vmode          = FB_VMODE_NONINTERLACED,
+		.flag           = 0,
+	},
 };
 
 static struct tft_config creality_lcd_cfg = {
