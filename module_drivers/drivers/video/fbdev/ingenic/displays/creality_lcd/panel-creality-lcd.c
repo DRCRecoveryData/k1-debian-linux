@@ -211,16 +211,16 @@ static struct fb_videomode panel_modes[] = {
 		/* 
 		 * Расширение полей убирает "белые точки" и "линии".
 		 */
-		.left_margin    = 15,
-		.right_margin   = 15,
-		.hsync_len      = 10,
+		.left_margin    = 10,
+		.right_margin   = 10,
+		.hsync_len      = 20,
 		
 		/* СИНХРОНИЗАЦИЯ С INIT 0xC1 */
 		.upper_margin   = 20,   // Совпадает с 0x14
 		.lower_margin   = 5,    // Совпадает с 0x05. Это должно убить дрожание.
 		
 		/* Оставляем 10, так как это держало картинку стабильной */
-		.vsync_len      = 10,
+		.vsync_len      = 4,
 		
 		/* Оставляем HIGH_ACT, так как на нем не дрожало */
 		.sync           = FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
