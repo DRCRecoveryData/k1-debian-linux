@@ -36,7 +36,7 @@ void lcd_st7701_tjc_lc_init(void)
 	SPI_SendData(0x63);
 	SPI_SendData(0x00);
 	SPI_SendCommand(0xc1);
-	SPI_SendData(0x0a);
+	SPI_SendData(0x12);
 	SPI_SendData(0x02);
 	SPI_SendCommand(0xc2);
 	SPI_SendData(0x01);
