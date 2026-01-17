@@ -196,24 +196,27 @@ static struct fb_videomode panel_modes[] = {
 		.refresh                = 60,
 		.xres                   = 480,
 		.yres                   = 800,
-		/* 
-		 * Расчет: 28.5 MHz = 28500000 Hz
-		 * Pixclock = 10^12 / 28500000 ≈ 35087 ps 
-		 */
-		.pixclock               = 35087,
 		
 		/* 
-		 * Увеличиваем паузы (Back Porch/Front Porch).
-		 * ST7701 любит большие значения HBP (left_margin).
+		 * Цель: Частота ~25.8 МГц (безопасная зона для шлейфов)
+		 * Pixclock = 10^12 / 25826400 ≈ 38720 ps
 		 */
-		.left_margin            = 40,   // HBP: увеличили с 10 до 40 для стабильности строки
-		.right_margin           = 40,   // HFP: симметрично увеличиваем
-		.upper_margin           = 14,   // VBP: немного дадим времени кадровой развертке
-		.lower_margin           = 12,   // VFP
+		.pixclock               = 38720,
+
+		/* Горизонтальные тайминги зажаты для снижения частоты */
+		.left_margin            = 10,   // HBP: минимум
+		.right_margin           = 10,   // HFP: минимум
+		.hsync_len              = 10,   // HSYNC: короткий импульс
 		
-		.hsync_len              = 10,   // HSYNC: стандартное значение
+		/* 
+		 * Вертикальные тайминги оставлены как в оригинале (30Гц),
+		 * так как ST7701 привык к этой структуре кадра.
+		 */
+		.upper_margin           = 20,   // VBP
+		.lower_margin           = 20,   // VFP
 		.vsync_len              = 4,    // VSYNC
-		
+
+		/* Оставляем полярность как была в рабочем 30Гц конфиге */
 		.sync                   = FB_SYNC_HOR_HIGH_ACT & FB_SYNC_VERT_HIGH_ACT,
 		.vmode                  = FB_VMODE_NONINTERLACED,
 		.flag                   = 0,
